@@ -4,9 +4,9 @@ import (
 	"regexp"
 	"time"
 
-	metrics "github.com/devopsfaith/krakend-metrics/v2"
 	"github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+	metrics "github.com/krakendio/krakend-metrics/v2"
 	"github.com/luraproject/lura/v2/logging"
 )
 
