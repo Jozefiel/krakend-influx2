@@ -1,0 +1,82 @@
+version: "3.7"
+
+services:
+  krakend:
+    image: frinx/krakend:latest
+    volumes:
+      - krakend.json:/etc/krakend/krakend.json
+    healthcheck:
+      test: curl --silent --write-out 'HTTPSTATUS:%{http_code}' -X GET 'http://127.0.0.1:8080/__health' || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    ports:
+      - target: 8080
+        published: 8080
+        mode: host  
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      mode: replicated
+      replicas: 1
+
+  grafana:
+    image: grafana/grafana:8.3.0
+    environment:
+      - GF_PATHS_CONFIG=/etc/grafana/grafana.ini
+    volumes: 
+      - frinx-monitoring-grafana:/var/lib/grafana
+      - ${UF_CONFIG_PATH}/monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ${UF_CONFIG_PATH}/monitoring/grafana/default.yml:/etc/grafana/provisioning/dashboards/default.yml
+      - ${UF_CONFIG_PATH}/monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini
+      # dashboards
+      - ${UF_CONFIG_PATH}/monitoring/grafana/db_loki_search.json:/etc/grafana/provisioning/dashboards/db_loki_search.json
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      mode: replicated
+      replicas: 1
+    ports:
+    - 3000:3000
+
+  influxdb:
+    image: influxdb:2.1
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_RETENTION=2d
+    volumes:
+      - frinx-monitoring-influxdb:/var/lib/influxdb2:rw
+    healthcheck:
+      test: ["CMD-SHELL", "influx ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      mode: replicated
+      replicas: 1
+

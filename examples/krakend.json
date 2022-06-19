@@ -9,15 +9,15 @@
     "folder": "/usr/local/lib/krakend/"
   },
   "extra_config": {
-    "router":{
-      "disable_path_decoding" : true,
-      "logger_skip_paths":[
+    "router": {
+      "disable_path_decoding": true,
+      "logger_skip_paths": [
         "/__health"
       ]
     },
     "plugin/http-server": {
       "name": "krakend-azure-plugin"
-    }, 
+    },
     "security/cors": {
       "allow_origins": [
         "*"
@@ -38,31 +38,33 @@
       "stdout": true
     },
     "telemetry/influx2": {
-        "address": "http://influxdb:8086",
-        "token": "eyJrIjoiN09MSVpVZjlVRG1xNHlLNApVbmZJOXFLWU1GOXFxNEIiLCJuIjoiD3Nzc3MiLCJpZCF6MX0",
-        "org": "krakend-metrics",
-        "bucket": "krakend",
-        "batch_size": 50,
-        "ttl": "30s"
+      "address": "http://influxdb:8086",
+      "token": "eyJrIjoiN09MSVpVZjlVRG1xNHlLNApVbmZJOXFLWU1GOXFxNEIiLCJuIjoiD3Nzc3MiLCJpZCF6MX0",
+      "org": "krakend-metrics",
+      "bucket": "krakend",
+      "batch_size": 50,
+      "ttl": "30s"
     },
-    "github_com/devopsfaith/krakend-metrics": {
+    "telemetry/metrics": {
       "collection_time": "30s",
       "listen_address": "127.0.0.1:8090"
-  }
+    }
   },
   "endpoints": [
     {
       "endpoint": "/stats",
       "method": "GET",
       "output_encoding": "no-op",
-      "headers_to_pass": ["*"],
+      "headers_to_pass": [
+        "*"
+      ],
       "backend": [
-          {
-              "url_pattern": "/__stats",
-              "host": [
-                  "localhost:8090"
-              ]
-          }
+        {
+          "url_pattern": "/__stats",
+          "host": [
+            "localhost:8090"
+          ]
+        }
       ]
     }
   ]
